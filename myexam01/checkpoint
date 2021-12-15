@@ -1,0 +1,6 @@
+model_checkpoint_path: "eta_model_5_1000.model"
+all_model_checkpoint_paths: "eta_model_1_1000.model"
+all_model_checkpoint_paths: "eta_model_2_1000.model"
+all_model_checkpoint_paths: "eta_model_3_1000.model"
+all_model_checkpoint_paths: "eta_model_4_1000.model"
+all_model_checkpoint_paths: "eta_model_5_1000.model"

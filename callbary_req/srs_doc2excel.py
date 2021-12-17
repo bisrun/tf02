@@ -37,7 +37,7 @@ class convertDoc2Excel:
         self.chap_lv_list = chapLvList
         self.detail_req_col_idx = -1
         self.directory_path = 'D:/Documents/++ST++/00_PROOM2021/02.배송고도화/01.요구사항'
-        self.docx_filename = '화물중계서비스용물류엔진_요구사항_20211215_v14.docx'
+        self.docx_filename = '화물중계서비스용물류엔진_요구사항_20211215_v15.docx'
         self.docx_filepath = os.path.join(self.directory_path, self.docx_filename)
         self.excel_filepath = self.docx_filepath.replace("docx", "xlsx")
         self.chapter_level_count = len(chapLvList)
@@ -139,6 +139,13 @@ class convertDoc2Excel:
                 self.table_col_map['DOCID'].contents = str_chap_no
 
         elif chap_lv == self.head_desc_chapter_lv :
+            self.detail_req_col_idx = -1
+            for col in self.table_col_list:
+                if col.descCol == True:
+                    if strline.find(col.field_name) >= 0:
+                        self.detail_req_col_idx = self.table_col_map[col.field_name].index
+
+            '''    
             if strline.find("REQID") >= 0:
                 self.detail_req_col_idx = self.table_col_map['REQID'].index
             elif strline.find("내용") >= 0:
@@ -147,9 +154,11 @@ class convertDoc2Excel:
                 self.detail_req_col_idx = self.table_col_map['제약사항'].index
             elif strline.find("비고") >= 0:
                 self.detail_req_col_idx = self.table_col_map['비고'].index
+            elif strline.find("문의사항") >= 0:
+                self.detail_req_col_idx = self.table_col_map['문의사항'].index
             else:
                 self.detail_req_col_idx = -1
-
+            '''
         elif chap_lv >= self.detail_desc_chapter_lv : #
             if chap_lv == self.detail_desc_chapter_lv:
                 prefix_line = '▶ '
@@ -179,14 +188,16 @@ class convertDoc2Excel:
 def run():
 
     col_info_list = []
-    col_info_list.append(tableColumnInfo(index=0, field_name='CHAP1', cell_width=20, indexCol=True, descCol=False ))
+    col_info_list.append(tableColumnInfo(index=0, field_name='CHAP1', cell_width=20, indexCol=True, descCol=False))
     col_info_list.append(tableColumnInfo(index=1, field_name='CHAP2', cell_width=20, indexCol=True, descCol=False))
     col_info_list.append(tableColumnInfo(index=2, field_name='TITLE', cell_width=30, indexCol=True, descCol=False))
     col_info_list.append(tableColumnInfo(index=3, field_name='DOCID', cell_width=10, indexCol=False, descCol=False))
     col_info_list.append(tableColumnInfo(index=4, field_name='REQID', cell_width=10, indexCol=False, descCol=True))
     col_info_list.append(tableColumnInfo(index=5, field_name='내용', cell_width=90, indexCol=False, descCol=True))
     col_info_list.append(tableColumnInfo(index=6, field_name='제약사항', cell_width=30, indexCol=False, descCol=True))
-    col_info_list.append(tableColumnInfo(index=7, field_name='비고', cell_width=50, indexCol=False, descCol=True))
+    col_info_list.append(tableColumnInfo(index=7, field_name='문의사항', cell_width=30, indexCol=False, descCol=True))
+    col_info_list.append(tableColumnInfo(index=8, field_name='검증방법', cell_width=30, indexCol=False, descCol=True))
+    col_info_list.append(tableColumnInfo(index=9, field_name='비고', cell_width=50, indexCol=False, descCol=True))
 
     col_map_by_fieldname ={}
     for _, col_info in enumerate(col_info_list):

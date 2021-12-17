@@ -30,6 +30,7 @@ class chapterLevelInfo:
         self.index = 0
         self.line = ""
 
+
 class convertDoc2Excel:
     def __init__(self , table_col_list, table_col_map, chapLvList):
         self.table_col_list = table_col_list
@@ -37,7 +38,7 @@ class convertDoc2Excel:
         self.chap_lv_list = chapLvList
         self.detail_req_col_idx = -1
         self.directory_path = 'D:/Documents/++ST++/00_PROOM2021/02.배송고도화/01.요구사항'
-        self.docx_filename = '화물중계서비스용물류엔진_요구사항_20211215_v15.docx'
+        self.docx_filename = '화물중계서비스용물류엔진_요구사항_20211217_v16.docx'
         self.docx_filepath = os.path.join(self.directory_path, self.docx_filename)
         self.excel_filepath = self.docx_filepath.replace("docx", "xlsx")
         self.chapter_level_count = len(chapLvList)
@@ -46,6 +47,10 @@ class convertDoc2Excel:
         self.title_chapter_lv = 2 # 문서구조에서 style 0,1,2 는 고정됨. 이건 건들지 말것
         self.head_desc_chapter_lv = 3 # 상세요구사항의 항목(REQID, 내용, 제약사항 .... )
         self.detail_desc_chapter_lv = 4 # 상세요구사항 설명(
+
+        self.reqid_map = {}
+        self.reqid_duplicated = []
+        self.reqid_col_index = self.getIndexColumnByName('REQID')
 
     def excelWorkbookInit(self):
         self.wb = openpyxl.Workbook()
@@ -63,7 +68,6 @@ class convertDoc2Excel:
         self.xrow = self.xrow + 1
 
     def convert(self):
-
         prev_chapter_level = 0
         doc = docx.Document(self.docx_filepath)
 
@@ -125,6 +129,18 @@ class convertDoc2Excel:
         self.ws.row_dimensions[self.xrow].height = (max_row_rount + 1) * 15
         self.xrow = self.xrow + 1
 
+    def setRequestID(self, request_id, doc_id ):
+        if request_id in self.reqid_map:
+            self.reqid_duplicated.append(request_id +":"+ doc_id)
+        else:
+            self.reqid_map[request_id] = doc_id
+
+    def getIndexColumnByName(self, name):
+        for col in self.table_col_list:
+            if col.field_name.find(name) >= 0:
+                return col.index
+        return -1
+
     def chapterSplit(self, str_chap_no, strline, prev_lv ):
         chap_no = str_chap_no.split('.')
         chap_lv = len(chap_no) - 2
@@ -145,20 +161,7 @@ class convertDoc2Excel:
                     if strline.find(col.field_name) >= 0:
                         self.detail_req_col_idx = self.table_col_map[col.field_name].index
 
-            '''    
-            if strline.find("REQID") >= 0:
-                self.detail_req_col_idx = self.table_col_map['REQID'].index
-            elif strline.find("내용") >= 0:
-                self.detail_req_col_idx = self.table_col_map['내용'].index
-            elif strline.find("제약사항") >= 0:
-                self.detail_req_col_idx = self.table_col_map['제약사항'].index
-            elif strline.find("비고") >= 0:
-                self.detail_req_col_idx = self.table_col_map['비고'].index
-            elif strline.find("문의사항") >= 0:
-                self.detail_req_col_idx = self.table_col_map['문의사항'].index
-            else:
-                self.detail_req_col_idx = -1
-            '''
+
         elif chap_lv >= self.detail_desc_chapter_lv : #
             if chap_lv == self.detail_desc_chapter_lv:
                 prefix_line = '▶ '
@@ -179,9 +182,15 @@ class convertDoc2Excel:
                 else:
                     self.table_col_list[self.detail_req_col_idx].contents = self.table_col_list[self.detail_req_col_idx].contents + "\r\n" + strline
 
+            if self.detail_req_col_idx == self.reqid_col_index:
+                self.setRequestID(strline.strip(), self.table_col_map['DOCID'].contents)
+
 
         #print("len: {}, {} {}".format(chap_lv,self.detail_req_col_idx, strline ))
-
+    def report(self):
+        print("-- DUPLICATED REQUIRMENT ID ")
+        for i, reqid in enumerate(self.reqid_duplicated):
+            print ("{}) reqid:{}".format(i, reqid))
 
 
 
@@ -192,7 +201,7 @@ def run():
     col_info_list.append(tableColumnInfo(index=1, field_name='CHAP2', cell_width=20, indexCol=True, descCol=False))
     col_info_list.append(tableColumnInfo(index=2, field_name='TITLE', cell_width=30, indexCol=True, descCol=False))
     col_info_list.append(tableColumnInfo(index=3, field_name='DOCID', cell_width=10, indexCol=False, descCol=False))
-    col_info_list.append(tableColumnInfo(index=4, field_name='REQID', cell_width=10, indexCol=False, descCol=True))
+    col_info_list.append(tableColumnInfo(index=4, field_name='REQID', cell_width=15, indexCol=False, descCol=True))
     col_info_list.append(tableColumnInfo(index=5, field_name='내용', cell_width=90, indexCol=False, descCol=True))
     col_info_list.append(tableColumnInfo(index=6, field_name='제약사항', cell_width=30, indexCol=False, descCol=True))
     col_info_list.append(tableColumnInfo(index=7, field_name='문의사항', cell_width=30, indexCol=False, descCol=True))
@@ -210,6 +219,7 @@ def run():
 
     converter = convertDoc2Excel(col_info_list,col_map_by_fieldname,chapLvList)
     converter.convert()
+    converter.report()
     print("--end--")
 
 if __name__ == '__main__':

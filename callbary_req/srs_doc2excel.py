@@ -1,4 +1,6 @@
 import os.path
+import sys
+
 import docx
 
 from docx import Document
@@ -13,6 +15,9 @@ import openpyxl
 from openpyxl.utils import get_column_letter
 from openpyxl.styles import Alignment
 from openpyxl.styles.fonts import Font
+import argparse
+from nvlogger import Logger
+
 
 
 
@@ -38,8 +43,9 @@ class convertDoc2Excel:
         self.chap_lv_list = chapLvList
         self.detail_req_col_idx = -1
         self.directory_path = 'D:/Documents/++ST++/00_PROOM2021/02.배송고도화/01.요구사항'
-        self.docx_filename = '화물중계서비스용물류엔진_요구사항_20211217_v16.docx'
-        self.docx_filepath = os.path.join(self.directory_path, self.docx_filename)
+        self.docx_filename = '화물중계서비스용물류엔진_요구사항_20211217_v17.docx'
+        #self.docx_filepath = os.path.join(self.directory_path, self.docx_filename)
+        self.docx_filepath = args.wordfilepath
         self.excel_filepath = self.docx_filepath.replace("docx", "xlsx")
         self.chapter_level_count = len(chapLvList)
 
@@ -220,7 +226,30 @@ def run():
     converter = convertDoc2Excel(col_info_list,col_map_by_fieldname,chapLvList)
     converter.convert()
     converter.report()
-    print("--end--")
+
 
 if __name__ == '__main__':
-    run()
+    global args
+    global logger
+
+    try:
+        logManager = Logger.instance()
+        logManager.setLogger("cb.log")
+        logger = logManager.getLogger()
+
+        argParser = argparse.ArgumentParser()
+        argParser.add_argument("--wordfilepath", help="word file path", required=True, default='srs.docx',
+                            type=str)
+
+        args = argParser.parse_args()
+        if os.path.isfile(args.wordfilepath) == False:
+            logger.info("invalid file path:{}".format(args.wordfilepath))
+            sys.exit("invalid word document file:"+args.wordfilepath)
+        else:
+            logger.info("file path:{}".format(args.wordfilepath))
+
+        logger.info("--start--")
+        run()
+        logger.info("--end--")
+    except Exception as err:
+        logger.info("error:"+err)

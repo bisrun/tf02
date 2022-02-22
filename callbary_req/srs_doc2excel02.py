@@ -41,14 +41,14 @@ class convertDoc2Excel:
         self.table_col_map = table_col_map
         self.chap_lv_list = chapLvList
         self.detail_req_col_idx = -1
-        self.directory_path = 'D:/Documents/++ST++/00_PROOM2021/02.배송고도화/01.요구사항'
-        self.docx_filename = '화물중계서비스용물류엔진_요구사항_20211217_v17.docx'
+        self.directory_path = 'D:/Documents/++ST++/00_PROOM2022/01.화물중계플랫폼/01.요구사항'
+        self.docx_filename = '화물중계플랫폼2_요구사항_20220222_v04.docx'
         #self.docx_filepath = os.path.join(self.directory_path, self.docx_filename)
         self.docx_filepath = args.wordfilepath
         self.excel_filepath = self.docx_filepath.replace("docx", "xlsx")
         self.chapter_level_count = len(chapLvList)
 
-        self.start_of_req_chapter_no = 6 #요구사항이 시작하는 lv1의 chapter no
+        self.start_of_req_chapter_no = 5 #요구사항이 시작하는 lv1의 chapter no ********
         self.title_chapter_lv = 2 # 문서구조에서 style 0,1,2 는 고정됨. 이건 건들지 말것
         self.head_desc_chapter_lv = 3 # 상세요구사항의 항목(REQID, 내용, 제약사항 .... )
         self.detail_desc_chapter_lv = 4 # 상세요구사항 설명(
@@ -211,7 +211,7 @@ def run():
     col_info_list.append(tableColumnInfo(index=2, field_name='TITLE', cell_width=30,  descCol=False))
     col_info_list.append(tableColumnInfo(index=3, field_name='DOCID', cell_width=10,  descCol=False))
     col_info_list.append(tableColumnInfo(index=4, field_name='REQID', cell_width=15,  descCol=True))
-    col_info_list.append(tableColumnInfo(index=5, field_name='담당자', cell_width=30, descCol=True))
+    col_info_list.append(tableColumnInfo(index=5, field_name='담당자', cell_width=15, descCol=True))
     col_info_list.append(tableColumnInfo(index=6, field_name='내용', cell_width=90,  descCol=True))
     col_info_list.append(tableColumnInfo(index=7, field_name='제약사항', cell_width=30,  descCol=True))
     col_info_list.append(tableColumnInfo(index=8, field_name='문의사항', cell_width=30,  descCol=True))

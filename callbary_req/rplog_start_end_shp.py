@@ -12,8 +12,8 @@ import fiona
 
 class test10k_pos :
     def __init__(self, unit):
-        base_dir = 'D:/download/Damiler AO 10k Test Sheet'
-        excel_file = '[Request] Daimler AO_10k_Test.xlsx'
+        base_dir = 'D:/Documents/++ST++/00_PROOM2021/02.배송고도화/03.리포트'
+        excel_file = '사용자별_트럭경로탐색횟수_20211222.xlsx'
         #excel_file = '[Request] Daimler_10k_Json_sample.xlsx'
         line_shp_file = "json_req_line.shp"
         pt_shp_file = "json_req_pt.shp"
@@ -31,15 +31,14 @@ class test10k_pos :
 
     def create_line_shp(self):
         df_from_excel = pd.read_excel(self.excel_dir, # write your directory here
-                                        sheet_name ='Sheet3',
-                                        names=['member_no', 'datetime',	'sx',	'sy',	'ex',	'ey'],
+                                        sheet_name ='Req_Route',
+                                        usecols="A,C,D,F,G",
                                         header=0,
-                                        dtype = {'member_no':np.uint32,
-                                            'datetime': np.string_,
-                                            'sx':  np.float64,
-                                            'sy':  np.float64,
-                                            'ex':  np.float64,
-                                            'ey':  np.float64}
+                                        dtype = {'TCIdx':np.int16,
+                                                 'startX': np.float64,
+                                               'startY':  np.float64,
+                                               'goalX':  np.float64,
+                                               'goalY':  np.float64}
                                       )
 
 
@@ -65,8 +64,8 @@ class test10k_pos :
 
         for index, item in df_from_excel.iterrows():
             #print(index, item, "\n")
-            x_list = [item.sx, item.ex]
-            y_list = [item.sy, item.ey]
+            x_list = [item.startX, item.goalX]
+            y_list = [item.startY, item.goalY]
             line_geom = LineString(zip(x_list, y_list))
             self.test_rpline.append(line_geom)
 
@@ -78,15 +77,14 @@ class test10k_pos :
 
     def create_pt_shp(self):
         df_from_excel = pd.read_excel(self.excel_dir, # write your directory here
-                                        sheet_name ='Sheet3',
-                                        names=['member_no', 'datetime',	'sx',	'sy',	'ex',	'ey'],
+                                        sheet_name ='Req_Route',
+                                        usecols="A,C,D,F,G",
                                         header=0,
-                                        dtype = {'member_no':np.uint32,
-                                            'datetime': np.string_,
-                                            'sx':  np.float64,
-                                            'sy':  np.float64,
-                                            'ex':  np.float64,
-                                            'ey':  np.float64}
+                                        dtype = {'TCIdx':np.int16,
+                                                 'startX': np.float64,
+                                               'startY':  np.float64,
+                                               'goalX':  np.float64,
+                                               'goalY':  np.float64}
                                       )
 
 
@@ -112,15 +110,15 @@ class test10k_pos :
         coord_set = set()
         for index, item in df_from_excel.iterrows():
             #print(index, item, "\n")
-            coord ="%.7f,%.7f"%(item.sx,item.sy)
+            coord ="%.7f,%.7f"%(item.startX,item.startY)
             if not coord in coord_set :
-                x_list = [item.sx]
-                y_list = [item.sy]
+                x_list = [item.startX]
+                y_list = [item.startY]
                 pt_geom = Point(zip(x_list, y_list))
                 self.test_rppt.append(pt_geom)
                 coord_set.add(coord)
 
-            coord = "%.7f,%.7f" % (item.ex, item.ey)
+            coord = "%.7f,%.7f" % (item.goalX, item.goalY)
             if not coord in coord_set :
                 x_list = [item.goalX]
                 y_list = [item.goalY]

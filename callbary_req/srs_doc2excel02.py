@@ -22,12 +22,13 @@ from nvlogger import Logger
 
 
 class tableColumnInfo:
-    def __init__(self, index, field_name, cell_width,  descCol ):
+    def __init__(self, index, field_name, cell_width,  descCol, indent = True):
         self.index = index
         self.field_name = field_name
         self.contents = ""
         self.cell_width = cell_width
         self.descCol = descCol    #요구사항의 상세설명 여부
+        self.indent = indent #
 
 class chapterLevelInfo:
     def __init__(self):
@@ -168,8 +169,9 @@ class convertDoc2Excel:
 
 
         elif chap_lv >= self.detail_desc_chapter_lv : #
+
             if chap_lv == self.detail_desc_chapter_lv:
-                prefix_line = '▶ '
+                    prefix_line = '▶ '
             elif chap_lv > self.detail_desc_chapter_lv:
                 for i in range(self.detail_desc_chapter_lv, chap_lv ):
                     prefix_line = prefix_line + '    '
@@ -180,7 +182,8 @@ class convertDoc2Excel:
                 elif chap_lv == self.detail_desc_chapter_lv+3:
                     prefix_line = prefix_line + '> '
 
-            strline = prefix_line + strline
+            if self.table_col_list[self.detail_req_col_idx].indent == True:
+                strline = prefix_line + strline
             if self.detail_req_col_idx >= 0 and len(strline) > 0:
                 if chap_no[chap_lv] == '1' and chap_lv == self.detail_desc_chapter_lv:
                     self.table_col_list[self.detail_req_col_idx].contents = strline
@@ -211,12 +214,17 @@ def run():
     col_info_list.append(tableColumnInfo(index=2, field_name='TITLE', cell_width=30,  descCol=False))
     col_info_list.append(tableColumnInfo(index=3, field_name='DOCID', cell_width=10,  descCol=False))
     col_info_list.append(tableColumnInfo(index=4, field_name='REQID', cell_width=15,  descCol=True))
-    col_info_list.append(tableColumnInfo(index=5, field_name='담당자', cell_width=15, descCol=True))
-    col_info_list.append(tableColumnInfo(index=6, field_name='내용', cell_width=90,  descCol=True))
-    col_info_list.append(tableColumnInfo(index=7, field_name='제약사항', cell_width=30,  descCol=True))
-    col_info_list.append(tableColumnInfo(index=8, field_name='문의사항', cell_width=30,  descCol=True))
-    col_info_list.append(tableColumnInfo(index=9, field_name='검증방법', cell_width=30,  descCol=True))
-    col_info_list.append(tableColumnInfo(index=10, field_name='비고', cell_width=50,  descCol=True))
+    col_info_list.append(tableColumnInfo(index=5, field_name='담당자', cell_width=10, descCol=True, indent=False))
+    col_info_list.append(tableColumnInfo(index=6, field_name='시작일', cell_width=10, descCol=True, indent=False))
+    col_info_list.append(tableColumnInfo(index=7, field_name='종료일', cell_width=10, descCol=True, indent=False))
+    col_info_list.append(tableColumnInfo(index=8, field_name='상태', cell_width=10, descCol=True, indent=False))
+    col_info_list.append(tableColumnInfo(index=9, field_name='요약', cell_width=90, descCol=True))
+    col_info_list.append(tableColumnInfo(index=10, field_name='상세내용', cell_width=90,  descCol=True))
+    col_info_list.append(tableColumnInfo(index=11, field_name='제약사항', cell_width=30,  descCol=True))
+    col_info_list.append(tableColumnInfo(index=12, field_name='프로토콜', cell_width=90, descCol=True))
+    col_info_list.append(tableColumnInfo(index=13, field_name='문의사항', cell_width=30,  descCol=True))
+    col_info_list.append(tableColumnInfo(index=14, field_name='검증방법', cell_width=30,  descCol=True))
+    col_info_list.append(tableColumnInfo(index=15, field_name='비고', cell_width=50,  descCol=True))
 
     col_map_by_fieldname ={}
     for _, col_info in enumerate(col_info_list):
